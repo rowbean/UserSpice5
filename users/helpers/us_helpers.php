@@ -778,55 +778,60 @@ if(!function_exists('addPage')) {
             }
           }
 
-          if(!function_exists('echouser')) {
-            function echouser($id){
+          if(!function_exists('getoutputechouser')) {
+            function getoutputechouser($id){
               $db = DB::getInstance();
               $settingsQ = $db->query("SELECT echouser FROM settings");
               $settings = $settingsQ->first();
 
-              if($settings->echouser == 0){
-                $query = $db->query("SELECT fname,lname FROM users WHERE id = ? LIMIT 1",array($id));
-                $count=$query->count();
-                if ($count > 0) {
-                  $results=$query->first();
-                  echo $results->fname." ".$results->lname;
-                } else {
-                  echo "Unknown";
-                }
+              switch ($settings->echouser) {
+                case 0:
+                  $query = $db->query("SELECT fname,lname FROM users WHERE id = ? LIMIT 1",array($id));
+                  $count=$query->count();
+                  if ($count > 0) {
+                    $results=$query->first();
+                    return $results->fname." ".$results->lname;
+                  } else {
+                    return "Unknown";
+                  }
+                  break;
+                case 1:
+                  $query = $db->query("SELECT username FROM users WHERE id = ? LIMIT 1",array($id));
+                  $count=$query->count();
+                  if ($count > 0) {
+                    $results=$query->first();
+                    return ucfirst($results->username);
+                  } else {
+                    return "-";
+                  }
+                  break;
+                case 2:
+                  $query = $db->query("SELECT username,fname,lname FROM users WHERE id = ? LIMIT 1",array($id));
+                  $count=$query->count();
+                  if ($count > 0) {
+                    $results=$query->first();
+                    return ucfirst($results->username).'('.$results->fname.' '.$results->lname.')';
+                  } else {
+                    return "Unknown";
+                  }
+                  break;
+                case 3:
+                  $query = $db->query("SELECT username,fname FROM users WHERE id = ? LIMIT 1",array($id));
+                  $count=$query->count();
+                  if ($count > 0) {
+                    $results=$query->first();
+                    return ucfirst($results->username).'('.$results->fname.')';
+                  } else {
+                    return "Unknown";
+                  }
+                  break;
               }
+            }
+          }
 
-              if($settings->echouser == 1){
-                $query = $db->query("SELECT username FROM users WHERE id = ? LIMIT 1",array($id));
-                $count=$query->count();
-                if ($count > 0) {
-                  $results=$query->first();
-                  echo ucfirst($results->username);
-                } else {
-                  echo "-";
-                }
-              }
-
-              if($settings->echouser == 2){
-                $query = $db->query("SELECT username,fname,lname FROM users WHERE id = ? LIMIT 1",array($id));
-                $count=$query->count();
-                if ($count > 0) {
-                  $results=$query->first();
-                  echo ucfirst($results->username).'('.$results->fname.' '.$results->lname.')';
-                } else {
-                  echo "Unknown";
-                }
-              }
-
-              if($settings->echouser == 3){
-                $query = $db->query("SELECT username,fname FROM users WHERE id = ? LIMIT 1",array($id));
-                $count=$query->count();
-                if ($count > 0) {
-                  $results=$query->first();
-                  echo ucfirst($results->username).'('.$results->fname.')';
-                } else {
-                  echo "Unknown";
-                }
-              }
+          if(!function_exists('echouser')) {
+            function echouser($id){
+              echo getechouseroutput($id);
             }
           }
 
